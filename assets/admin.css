@@ -1,0 +1,85 @@
+.woc-tasks {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.woc-task {
+    background: #fff;
+    border: 1px solid #dcdcde;
+    border-radius: 8px;
+    padding: 14px;
+}
+
+.woc-task-title {
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.woc-task-date {
+    color: #646970;
+    margin-bottom: 6px;
+}
+
+.woc-task-description {
+    line-height: 1.5;
+}
+
+.woc-task-status {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 6px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.woc-task-status-pending {
+    background: #f6f7f7;
+    color: #646970;
+}
+
+.woc-task:has(.woc-task-status-pending) {
+    opacity: 0.72;
+}
+
+.woc-task-status-open {
+    background: #eef4ff;
+    color: #1d4ed8;
+}
+
+.woc-task-status-progress {
+    background: #fff7e6;
+    color: #b45309;
+}
+
+.woc-task-status-done {
+    background: #ecfdf3;
+    color: #15803d;
+}
+
+.woc-task-priority {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 6px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.woc-task-priority-low {
+    background: #f6f7f7;
+    color: #646970;
+}
+
+.woc-task-priority-normal {
+    background: #eef4ff;
+    color: #1d4ed8;
+}
+
+.woc-task-priority-urgent {
+    background: #fff1f2;
+    color: #be123c;
+}
