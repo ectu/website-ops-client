@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Website Ops Client
  * Description: Client Plugin für Website Ops Master Dashboard
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Symforma
  */
 
@@ -37,4 +37,3 @@ $updateChecker = PucFactory::buildUpdateChecker(
 );
 
 $updateChecker->setBranch('main');
-$updateChecker->setAuthentication('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');
