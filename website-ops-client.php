@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Website Ops Client
- * Description: Client Plugin für Website Ops Master Dashboard
+ * Description: Verbindet WordPress-Websites mit dem Website Ops Master Dashboard. Kunden können Aufgaben erfassen, Status verfolgen und Änderungen zentral verwalten.
  * Version: 1.0.1
  * Author: Symforma
  */
