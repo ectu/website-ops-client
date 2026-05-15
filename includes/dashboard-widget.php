@@ -209,9 +209,13 @@ function woc_send_heartbeat() {
         trailingslashit($master_url) . 'wp-json/website-ops/v1/heartbeat',
         [
             'timeout' => 10,
-            'body'    => [
+            'body' => [
                 'project_id' => $project_id,
                 'token'      => $token,
+                'php_version' => PHP_VERSION,
+                'wp_version'  => get_bloginfo('version'),
+                'site_url'    => home_url(),
+                'site_icon'   => get_site_icon_url(128),
             ],
         ]
     );
