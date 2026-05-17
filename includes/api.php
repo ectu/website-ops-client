@@ -95,6 +95,47 @@ function woc_create_task(
     return $body;
 }
 
+function woc_get_site_health_status() {
+
+    $value = get_transient('health-check-site-status-result');
+
+    if (!$value) {
+        $value = get_site_transient('health-check-site-status-result');
+    }
+
+    if (!$value) {
+        $value = get_option('health-check-site-status-result');
+    }
+
+    if (!$value) {
+        return 'unknown';
+    }
+
+    if (is_numeric($value)) {
+        $score = (int) $value;
+
+        if ($score >= 80) {
+            return 'good';
+        }
+
+        if ($score >= 60) {
+            return 'recommended';
+        }
+
+        return 'critical';
+    }
+
+    if (is_string($value)) {
+        $value = strtolower($value);
+
+        if (in_array($value, ['good', 'recommended', 'critical'], true)) {
+            return $value;
+        }
+    }
+
+    return 'unknown';
+}
+
 function woc_send_heartbeat_request() {
 
     $master_url = get_option('woc_master_url');
@@ -120,7 +161,7 @@ function woc_send_heartbeat_request() {
             'wp_version'  => get_bloginfo('version'),
             'site_url'    => home_url(),
             'site_icon'   => get_site_icon_url(128),
-            'site_health' => get_site_option('health-check-site-status-result'),
+            'site_health' => woc_get_site_health_status(),
         ],
         ]
     );
