@@ -205,20 +205,7 @@ function woc_send_heartbeat() {
         return;
     }
 
-    wp_remote_post(
-        trailingslashit($master_url) . 'wp-json/website-ops/v1/heartbeat',
-        [
-            'timeout' => 10,
-            'body' => [
-                'project_id' => $project_id,
-                'token'      => $token,
-                'php_version' => PHP_VERSION,
-                'wp_version'  => get_bloginfo('version'),
-                'site_url'    => home_url(),
-                'site_icon'   => get_site_icon_url(128),
-            ],
-        ]
-    );
+    woc_send_heartbeat_request();
 
     set_transient(
         'woc_last_heartbeat',
