@@ -111,26 +111,49 @@ function woc_get_site_health_status() {
         return 'unknown';
     }
 
-    if (is_numeric($value)) {
-        $score = (int) $value;
+    if (is_string($value)) {
+        $decoded = json_decode($value, true);
 
-        if ($score >= 80) {
-            return 'good';
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            $value = $decoded;
+        } else {
+            $plain = strtolower(trim($value));
+
+            if (in_array($plain, ['good', 'recommended', 'critical'], true)) {
+                return $plain;
+            }
+
+            if (is_numeric($plain)) {
+                $score = (int) $plain;
+
+                if ($score >= 80) {
+                    return 'good';
+                }
+
+                if ($score >= 60) {
+                    return 'recommended';
+                }
+
+                return 'critical';
+            }
+
+            return 'unknown';
+        }
+    }
+
+    if (is_array($value)) {
+        $critical = (int) ($value['critical'] ?? 0);
+        $recommended = (int) ($value['recommended'] ?? 0);
+
+        if ($critical > 0) {
+            return 'critical';
         }
 
-        if ($score >= 60) {
+        if ($recommended > 0) {
             return 'recommended';
         }
 
-        return 'critical';
-    }
-
-    if (is_string($value)) {
-        $value = strtolower($value);
-
-        if (in_array($value, ['good', 'recommended', 'critical'], true)) {
-            return $value;
-        }
+        return 'good';
     }
 
     return 'unknown';
