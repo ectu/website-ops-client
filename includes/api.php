@@ -130,7 +130,7 @@ function woc_get_site_health_status() {
                     return 'good';
                 }
 
-                if ($score >= 60) {
+                if ($score >= 40) {
                     return 'recommended';
                 }
 
@@ -142,14 +142,28 @@ function woc_get_site_health_status() {
     }
 
     if (is_array($value)) {
-        $critical = (int) ($value['critical'] ?? 0);
-        $recommended = (int) ($value['recommended'] ?? 0);
+        if (isset($value['status']) && in_array($value['status'], ['good', 'recommended', 'critical'], true)) {
+            return $value['status'];
+        }
 
-        if ($critical > 0) {
+        if (isset($value['score'])) {
+            $score = (int) $value['score'];
+
+            if ($score >= 80) {
+                return 'good';
+            }
+
+            if ($score >= 40) {
+                return 'recommended';
+            }
+
             return 'critical';
         }
 
-        if ($recommended > 0) {
+        $critical = (int) ($value['critical'] ?? 0);
+        $recommended = (int) ($value['recommended'] ?? 0);
+
+        if ($critical > 0 || $recommended > 0) {
             return 'recommended';
         }
 
