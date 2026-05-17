@@ -106,11 +106,11 @@ function woc_render_settings_page() {
     $connection_result = null;
 
     if (isset($_POST['woc_test_connection'])) {
-
         check_admin_referer('woc_test_connection');
-
         $connection_result = woc_get_tasks();
     }
+
+    $heartbeat_debug = get_option('woc_last_heartbeat_debug');
 
     ?>
     <div class="wrap">
@@ -118,13 +118,9 @@ function woc_render_settings_page() {
         <h1>Website Ops Client</h1>
 
         <?php if (isset($_GET['connected'])) : ?>
-
             <div class="notice notice-success is-dismissible">
-                <p>
-                    Verbindung erfolgreich übernommen.
-                </p>
+                <p>Verbindung erfolgreich übernommen.</p>
             </div>
-
         <?php endif; ?>
 
         <form method="post" action="options.php">
@@ -134,15 +130,10 @@ function woc_render_settings_page() {
             <table class="form-table">
 
                 <tr>
-
                     <th scope="row">
-                        <label for="woc_master_url">
-                            Master URL
-                        </label>
+                        <label for="woc_master_url">Master URL</label>
                     </th>
-
                     <td>
-
                         <input
                             type="url"
                             id="woc_master_url"
@@ -150,21 +141,14 @@ function woc_render_settings_page() {
                             value="<?php echo esc_attr(get_option('woc_master_url')); ?>"
                             class="regular-text"
                         >
-
                     </td>
-
                 </tr>
 
                 <tr>
-
                     <th scope="row">
-                        <label for="woc_project_id">
-                            Projekt-ID
-                        </label>
+                        <label for="woc_project_id">Projekt-ID</label>
                     </th>
-
                     <td>
-
                         <input
                             type="number"
                             id="woc_project_id"
@@ -172,21 +156,14 @@ function woc_render_settings_page() {
                             value="<?php echo esc_attr(get_option('woc_project_id')); ?>"
                             class="small-text"
                         >
-
                     </td>
-
                 </tr>
 
                 <tr>
-
                     <th scope="row">
-                        <label for="woc_api_token">
-                            API Token
-                        </label>
+                        <label for="woc_api_token">API Token</label>
                     </th>
-
                     <td>
-
                         <input
                             type="text"
                             id="woc_api_token"
@@ -194,9 +171,7 @@ function woc_render_settings_page() {
                             value="<?php echo esc_attr(get_option('woc_api_token')); ?>"
                             class="regular-text"
                         >
-
                     </td>
-
                 </tr>
 
             </table>
@@ -208,18 +183,8 @@ function woc_render_settings_page() {
         <hr>
 
         <h2>Verbindung testen</h2>
-  
-        $heartbeat_debug = get_option('woc_last_heartbeat_debug');
-
-if ($heartbeat_debug) {
-    echo '<h2>Heartbeat Debug</h2>';
-    echo '<pre style="white-space:pre-wrap;background:#f6f7f7;border:1px solid #ccd0d4;padding:12px;">';
-    echo esc_html(print_r($heartbeat_debug, true));
-    echo '</pre>';
-}
 
         <form method="post">
-
             <?php wp_nonce_field('woc_test_connection'); ?>
 
             <?php submit_button(
@@ -227,32 +192,29 @@ if ($heartbeat_debug) {
                 'secondary',
                 'woc_test_connection'
             ); ?>
-
         </form>
 
         <?php if ($connection_result !== null) : ?>
-
             <div class="notice <?php echo !empty($connection_result['success']) ? 'notice-success' : 'notice-error'; ?> inline">
-
                 <p>
-
                     <?php if (!empty($connection_result['success'])) : ?>
-
                         Verbindung erfolgreich.
                         Gefundene Aufgaben:
                         <?php echo esc_html($connection_result['count'] ?? 0); ?>
-
                     <?php else : ?>
-
                         Verbindung fehlgeschlagen:
                         <?php echo esc_html($connection_result['message'] ?? 'Unbekannter Fehler'); ?>
-
                     <?php endif; ?>
-
                 </p>
-
             </div>
+        <?php endif; ?>
 
+        <?php if ($heartbeat_debug) : ?>
+            <hr>
+
+            <h2>Heartbeat Debug</h2>
+
+            <pre style="white-space:pre-wrap;background:#f6f7f7;border:1px solid #ccd0d4;padding:12px;"><?php echo esc_html(print_r($heartbeat_debug, true)); ?></pre>
         <?php endif; ?>
 
     </div>
