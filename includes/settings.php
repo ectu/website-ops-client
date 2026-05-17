@@ -110,8 +110,6 @@ function woc_render_settings_page() {
         $connection_result = woc_get_tasks();
     }
 
-    $heartbeat_debug = get_option('woc_last_heartbeat_debug');
-
     ?>
     <div class="wrap">
 
@@ -207,14 +205,6 @@ function woc_render_settings_page() {
                     <?php endif; ?>
                 </p>
             </div>
-        <?php endif; ?>
-
-        <?php if ($heartbeat_debug) : ?>
-            <hr>
-
-            <h2>Heartbeat Debug</h2>
-
-            <pre style="white-space:pre-wrap;background:#f6f7f7;border:1px solid #ccd0d4;padding:12px;"><?php echo esc_html(print_r($heartbeat_debug, true)); ?></pre>
         <?php endif; ?>
 
     </div>

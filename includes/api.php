@@ -98,6 +98,7 @@ function woc_create_task(
 function woc_send_heartbeat_request() {
 
     $master_url = get_option('woc_master_url');
+
     $project_id = get_option('woc_project_id');
     $token      = get_option('woc_api_token');
 
@@ -112,14 +113,15 @@ function woc_send_heartbeat_request() {
         trailingslashit($master_url) . 'wp-json/website-ops/v1/heartbeat',
         [
             'timeout' => 10,
-            'body'    => [
-                'project_id'  => $project_id,
-                'token'       => $token,
-                'php_version' => PHP_VERSION,
-                'wp_version'  => get_bloginfo('version'),
-                'site_url'    => home_url(),
-                'site_icon'   => get_site_icon_url(128),
-            ],
+            'body' => [
+            'project_id'  => $project_id,
+            'token'       => $token,
+            'php_version' => PHP_VERSION,
+            'wp_version'  => get_bloginfo('version'),
+            'site_url'    => home_url(),
+            'site_icon'   => get_site_icon_url(128),
+            'site_health' => get_site_option('health-check-site-status-result'),
+        ],
         ]
     );
 

@@ -3,8 +3,8 @@
 Contributors: symforma
 Requires at least: 6.0
 Tested up to: 6.9
-Stable tag: 1.0.5
-Version: 1.0.5
+Stable tag: 1.0.6
+Version: 1.0.6
 License: GPLv2 or later
 
 == Description ==
@@ -12,6 +12,10 @@ License: GPLv2 or later
 Verbindet Kundenwebsites mit dem Website Ops Master Dashboard.
 
 == Changelog ==
+
+= 1.0.6 =
+* Übermittlung von Website-Zustand korrigiert
+
 
 = 1.0.4 =
 * Übermittlung von PHP Version, Seitenzustand und Favicon an Master ergänzt
