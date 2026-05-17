@@ -62,19 +62,34 @@ function woc_create_task(
     }
 
     $response = wp_remote_post(
-        trailingslashit($master_url) . 'wp-json/website-ops/v1/tasks/create',
-        [
-            'timeout' => 15,
-            'body'    => [
-                'project_id' => $project_id,
-                'token'      => $token,
-                'title'      => $title,
-                'message'    => $message,
-                'type'       => $type,
-                'priority'   => $priority,
-            ],
-        ]
-    );
+    trailingslashit($master_url) . 'wp-json/website-ops/v1/heartbeat',
+    [
+        'timeout' => 10,
+        'body'    => [
+            'project_id'   => $project_id,
+            'token'        => $token,
+            'php_version'  => PHP_VERSION,
+            'wp_version'   => get_bloginfo('version'),
+            'site_url'     => home_url(),
+            'site_icon'    => get_site_icon_url(128),
+        ],
+    ]
+);
+
+if (is_wp_error($response)) {
+    update_option('woc_last_heartbeat_debug', [
+        'time'    => current_time('mysql'),
+        'success' => false,
+        'error'   => $response->get_error_message(),
+    ]);
+} else {
+    update_option('woc_last_heartbeat_debug', [
+        'time'          => current_time('mysql'),
+        'success'       => true,
+        'response_code' => wp_remote_retrieve_response_code($response),
+        'body'          => wp_remote_retrieve_body($response),
+    ]);
+}
 
     if (is_wp_error($response)) {
         return [

@@ -208,6 +208,15 @@ function woc_render_settings_page() {
         <hr>
 
         <h2>Verbindung testen</h2>
+  
+        $heartbeat_debug = get_option('woc_last_heartbeat_debug');
+
+if ($heartbeat_debug) {
+    echo '<h2>Heartbeat Debug</h2>';
+    echo '<pre style="white-space:pre-wrap;background:#f6f7f7;border:1px solid #ccd0d4;padding:12px;">';
+    echo esc_html(print_r($heartbeat_debug, true));
+    echo '</pre>';
+}
 
         <form method="post">
 
