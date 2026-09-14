@@ -184,32 +184,11 @@ echo '</div>';
 }
 
 add_action('admin_init', 'woc_send_heartbeat');
-
 function woc_send_heartbeat() {
-
-    if (!is_admin()) {
-        return;
-    }
-
-    $master_url = get_option('woc_master_url');
-    $project_id = get_option('woc_project_id');
-    $token      = get_option('woc_api_token');
-
-    if (!$master_url || !$project_id || !$token) {
-        return;
-    }
-
-    $last_ping = get_transient('woc_last_heartbeat');
-
-    if ($last_ping) {
-        return;
-    }
-
+    if (!is_admin() || !current_user_can('manage_options')) { return; }
+    // The explicit button below sends once and bypasses the interval.
+    if (isset($_POST['woc_send_heartbeat_now']) || isset($_POST['woc_test_connection']) || (isset($_POST['option_page']) && $_POST['option_page'] === 'woc_settings')) { return; }
+    if (!get_option('woc_master_url') || !get_option('woc_project_id') || !get_option('woc_api_token')) { return; }
+    if (get_transient('woc_last_heartbeat') || get_transient('woc_heartbeat_retry')) { return; }
     woc_send_heartbeat_request();
-
-    set_transient(
-        'woc_last_heartbeat',
-        true,
-        15 * MINUTE_IN_SECONDS
-    );
 }

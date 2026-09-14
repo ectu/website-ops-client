@@ -50,45 +50,24 @@ add_action('admin_init', function () {
 
 });
 
-/**
- * ---------------------------------------------------
- * AUTO CONNECT
- * ---------------------------------------------------
- */
-
-add_action('admin_init', function () {
-
-    if (!current_user_can('manage_options')) {
-        return;
+// Reset the interval when the connection target or credentials change.
+function woc_reset_heartbeat_state() {
+    delete_transient('woc_last_heartbeat');
+    delete_transient('woc_heartbeat_retry');
+    delete_option('woc_last_heartbeat_debug');
+    delete_option('woc_last_heartbeat_success');
+}
+foreach (['woc_master_url', 'woc_project_id', 'woc_api_token'] as $woc_option) {
+    add_action('update_option_' . $woc_option, 'woc_reset_heartbeat_state', 10, 0);
+    add_action('add_option_' . $woc_option, 'woc_reset_heartbeat_state', 10, 0);
+}
+unset($woc_option);
+// An upgrade does not run activation hooks; also reset an old cached success once.
+add_action('admin_init', static function () {
+    if (current_user_can('manage_options') && get_option('woc_heartbeat_fix_version') !== '1.0.7') {
+        woc_reset_heartbeat_state();
+        update_option('woc_heartbeat_fix_version', '1.0.7', false);
     }
-
-    if (!isset($_GET['page']) || $_GET['page'] !== 'website-ops-client') {
-        return;
-    }
-
-    if (
-        empty($_GET['master_url']) ||
-        empty($_GET['project_id']) ||
-        empty($_GET['token'])
-    ) {
-        return;
-    }
-
-    $master_url = esc_url_raw($_GET['master_url']);
-    $project_id = absint($_GET['project_id']);
-    $token      = sanitize_text_field($_GET['token']);
-
-    update_option('woc_master_url', $master_url);
-    update_option('woc_project_id', $project_id);
-    update_option('woc_api_token', $token);
-
-    wp_safe_redirect(add_query_arg([
-        'page'      => 'website-ops-client',
-        'connected' => '1',
-    ], admin_url('options-general.php')));
-
-    exit;
-
 });
 
 /**
@@ -104,12 +83,19 @@ function woc_render_settings_page() {
     }
 
     $connection_result = null;
+    $heartbeat_result = null;
 
     if (isset($_POST['woc_test_connection'])) {
         check_admin_referer('woc_test_connection');
         $connection_result = woc_get_tasks();
+        if (!empty($connection_result['success'])) { $heartbeat_result = woc_send_heartbeat_request(); }
     }
 
+    if (isset($_POST['woc_send_heartbeat_now'])) {
+        check_admin_referer('woc_send_heartbeat_now');
+        $heartbeat_result = woc_send_heartbeat_request();
+    }
+    $heartbeat_summary = $heartbeat_result ?: get_option('woc_last_heartbeat_debug');
     ?>
     <div class="wrap">
 
@@ -163,7 +149,8 @@ function woc_render_settings_page() {
                     </th>
                     <td>
                         <input
-                            type="text"
+                            type="password"
+                            autocomplete="new-password"
                             id="woc_api_token"
                             name="woc_api_token"
                             value="<?php echo esc_attr(get_option('woc_api_token')); ?>"
@@ -207,6 +194,23 @@ function woc_render_settings_page() {
             </div>
         <?php endif; ?>
 
+        <hr>
+        <h2>Heartbeat</h2>
+        <p>Übermittelt PHP-Version, Favicon und Website-Zustand an den Master. Automatisch bei Administrator-Aufrufen, nach bestätigtem Erfolg höchstens alle 15 Minuten.</p>
+        <form method="post">
+            <?php wp_nonce_field('woc_send_heartbeat_now'); ?>
+            <?php submit_button('Heartbeat jetzt senden', 'secondary', 'woc_send_heartbeat_now'); ?>
+        </form>
+        <?php if (is_array($heartbeat_summary)) : ?>
+            <div class="notice <?php echo !empty($heartbeat_summary['success']) ? 'notice-success' : 'notice-error'; ?> inline">
+                <p><?php echo esc_html(($heartbeat_summary['time'] ?? '') . ' — ' . ($heartbeat_summary['message'] ?? 'Noch keine geprüfte Antwort.')); ?></p>
+            </div>
+        <?php else : ?>
+            <p>Noch kein Heartbeat-Versuch mit diesen Einstellungen.</p>
+        <?php endif; ?>
+        <?php if (get_option('woc_last_heartbeat_success')) : ?>
+            <p>Zuletzt vom Master bestätigt: <?php echo esc_html(get_option('woc_last_heartbeat_success')); ?></p>
+        <?php endif; ?>
     </div>
     <?php
 }
