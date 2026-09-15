@@ -2,9 +2,9 @@
 
 Contributors: symforma
 Requires at least: 6.0
-Tested up to: 6.9
-Stable tag: 1.0.7
-Version: 1.0.7
+Tested up to: 7.0
+Stable tag: 1.2.0
+Version: 1.2.0
 License: GPLv2 or later
 
 == Description ==
@@ -12,6 +12,12 @@ License: GPLv2 or later
 Verbindet Kundenwebsites mit dem Website Ops Master Dashboard.
 
 == Changelog ==
+= 1.2.0 =
+Überträgt Core-/Plugin-/Theme-Updates und WPvivid-Pro-Backup-Metadaten an Master 2.3.0. Enthält die E-Mail-Regeln aus 1.1.0.
+
+= 1.1.0 =
+Zentrale E-Mail-Regeln: nur erfolgreiche automatische WordPress-, Plugin- und Theme-Updates unterdrücken. Fehler bleiben erhalten. Projekt-Ausnahmen und lokaler Regel-Cache.
+
 
 = 1.0.7 =
 * Heartbeats erst nach Bestätigung durch den Master als erfolgreich behandeln.

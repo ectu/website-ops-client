@@ -56,6 +56,8 @@ function woc_reset_heartbeat_state() {
     delete_transient('woc_heartbeat_retry');
     delete_option('woc_last_heartbeat_debug');
     delete_option('woc_last_heartbeat_success');
+    delete_option('woc_email_policy');
+    delete_option('woc_email_policy_synced');
 }
 foreach (['woc_master_url', 'woc_project_id', 'woc_api_token'] as $woc_option) {
     add_action('update_option_' . $woc_option, 'woc_reset_heartbeat_state', 10, 0);
@@ -167,6 +169,8 @@ function woc_render_settings_page() {
 
         <hr>
 
+        <?php woc_render_email_policy(); ?>
+        <hr>
         <h2>Verbindung testen</h2>
 
         <form method="post">

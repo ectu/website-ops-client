@@ -103,14 +103,14 @@ function woc_get_site_health_status() {
             return 'critical';
         }
 
-        $critical = (int) ($value['critical'] ?? 0);
-        $recommended = (int) ($value['recommended'] ?? 0);
-
-        if ($critical > 0 || $recommended > 0) {
-            return 'recommended';
-        }
-
-        return 'good';
+        if (!isset($value['good'], $value['recommended'], $value['critical'])) { return 'unknown'; }
+        $good = max(0, (int) $value['good']);
+        $recommended = max(0, (int) $value['recommended']);
+        $critical = max(0, (int) $value['critical']);
+        $total = $good + $recommended + $critical * 1.5;
+        if (!$total) { return 'unknown'; }
+        $score = 100 - ceil(($recommended * 0.5 + $critical * 1.5) / $total * 100);
+        return $score >= 80 && $critical === 0 ? 'good' : 'recommended';
     }
 
     return 'unknown';
@@ -118,6 +118,7 @@ function woc_get_site_health_status() {
 
 function woc_send_heartbeat_request() {
     $result = woc_api_request('heartbeat', 'POST', [
+        'maintenance' => wp_json_encode(woc_maintenance_snapshot()),
         'php_version' => PHP_VERSION,
         'wp_version' => get_bloginfo('version'),
         'site_url' => home_url(),
@@ -133,6 +134,7 @@ function woc_send_heartbeat_request() {
     ];
     update_option('woc_last_heartbeat_debug', $summary, false);
     if ($success) {
+        if (isset($result['email_policy'])) { woc_store_email_policy($result['email_policy']); }
         set_transient('woc_last_heartbeat', true, 15 * MINUTE_IN_SECONDS);
         delete_transient('woc_heartbeat_retry');
         update_option('woc_last_heartbeat_success', current_time('mysql'), false);
